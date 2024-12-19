@@ -21,6 +21,7 @@ application {
 
 tasks.register('aggregatePmdReports', AggregatePmdReportsTask) {
     projectsFiles = files(
+            '../app/build/reports/pmd/main.xml',
             '../domains/build/reports/pmd/main.xml',
             '../presentations/build/reports/pmd/main.xml',
             '../infrastructures/build/reports/pmd/main.xml',
