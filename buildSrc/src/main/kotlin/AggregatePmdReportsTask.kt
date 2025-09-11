@@ -36,7 +36,7 @@ abstract class AggregatePmdReportsTask : DefaultTask() {
                         values.put("class", attributes.getNamedItem("class").nodeValue)
                         values.put("beginline", attributes.getNamedItem("beginline").nodeValue)
                         values.put("endline", attributes.getNamedItem("endline").nodeValue)
-                        values.put("text", attributes.getNamedItem("text").nodeValue)
+                        values.put("text", violationNode.textContent)
                         if(!aggregatedRules.containsKey(rule)) {
                             aggregatedRules.put(rule, ArrayList());
                         }
@@ -60,7 +60,7 @@ abstract class AggregatePmdReportsTask : DefaultTask() {
             documentResult += aggregatedRules.map { entries ->
                 """
               <div>
-              <h2>${entries.key} (violation count: ${entries.value.size}</h2>
+              <h2>${entries.key} (violation count: ${entries.value.size})</h2>
               """.trimIndent() +
                         entries.value.map { s ->
                             """
@@ -74,6 +74,8 @@ abstract class AggregatePmdReportsTask : DefaultTask() {
               </div>
             """.trimIndent()
             }.reduce { a, b -> "$a\n$b" };
+        } else {
+            documentResult+="<div><h2>There ar 0 Pmd Violation in your projects</h2></div>\n"
         }
         documentResult+="""
                 </div>
