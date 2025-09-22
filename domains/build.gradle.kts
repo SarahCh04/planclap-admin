@@ -4,5 +4,5 @@ plugins {
 }
 
 dependencies {
-     testImplementation("org.mockito:mockito-core")
+     testImplementation(libs.mockito)
 }

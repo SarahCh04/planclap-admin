@@ -6,5 +6,5 @@ plugins {
 dependencies {
      implementation(project(":domains"))
      
-     testImplementation("org.mockito:mockito-core")
+     testImplementation(libs.mockito)
 }
