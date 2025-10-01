@@ -4,9 +4,13 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </Console>
-    <File name="LogFile" fileName="logs/app.log">
+    <RollingFile name="LogFile" filePattern="logs/app_%d{yyyyMMdd}.log">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-    </File>
+      <Policies>
+          <TimeBasedTriggeringPolicy interval="1"
+                                     modulate="true"/>
+      </Policies>
+    </RollingFile>
   </Appenders>
   <Loggers>
     <Logger name="org.helmo.example" level="DEBUG" additivity="false">
