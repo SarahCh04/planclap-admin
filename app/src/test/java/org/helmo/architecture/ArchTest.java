@@ -56,6 +56,8 @@ public class ArchTest {
                 .resideInAnyPackage("java..",
                         "org.apache.logging.log4j..",
                         "org.aspectj.lang..",
+                        "com.google.gson..",
+                        "org.json..",
                         globalPackageName + ".infrastructures..",
                         globalPackageName + ".domains..");
 
