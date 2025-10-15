@@ -10,5 +10,5 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-rootProject.name = "ai-java-stub"
+rootProject.name = "planclap-admin"
 include("app", "views", "presentations", "domains", "infrastructures")

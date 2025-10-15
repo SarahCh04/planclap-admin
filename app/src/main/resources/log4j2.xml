@@ -13,7 +13,7 @@
     </RollingFile>
   </Appenders>
   <Loggers>
-    <Logger name="org.helmo.example" level="DEBUG" additivity="false">
+    <Logger name="org.helmo.planclap_admin" level="DEBUG" additivity="false">
       <AppenderRef ref="Console"/>
       <AppenderRef ref="LogFile" />
     </Logger>

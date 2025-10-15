@@ -1,7 +1,7 @@
 package org.helmo.architecture;
 
 import com.tngtech.archunit.core.importer.ClassFileImporter;
-import org.helmo.example.app.Program;
+import org.helmo.planclap_admin.app.Program;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

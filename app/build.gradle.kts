@@ -22,7 +22,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.helmo.example.app.Program"
+    mainClass = "org.helmo.planclap_admin.app.Program"
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
