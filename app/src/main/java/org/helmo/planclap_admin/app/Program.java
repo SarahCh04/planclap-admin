@@ -3,13 +3,78 @@
  */
 package org.helmo.planclap_admin.app;
 
+import org.helmo.planclap_admin.presentations.MoviePresenter;
+import org.helmo.planclap_admin.presentations.commands.CommandMap;
+import org.helmo.planclap_admin.presentations.commands.ListMoviesCommand;
+import org.helmo.planclap_admin.views.MovieListCLIView;
+import org.helmo.planclap_admin.infrastructures.JsonMovieRepository;
 
-import org.helmo.planclap_admin.infrastructures.Repository;
-import org.helmo.planclap_admin.views.View;
+import java.io.*;
 
+/**
+ * La classe {@code Program} constitue le point d’entrée principal de l’application
+ *
+ * <p>Elle analyse les arguments de la ligne de commande, initialise les différentes
+ * couches de l’architecture MVP (Model-View-Presenter), puis lance la boucle principale
+ * du menu CLI.</p>
+ *
+ * <p>Le programme doit être exécuté avec l’argument obligatoire :
+ * <pre>
+ *     --dir=chemin/vers/le/dossier
+ * </pre>
+ * où le dossier spécifié contient (ou contiendra) le fichier {@code movies.json}
+ * utilisé pour charger les films à planifier.</p>
+ */
 public class Program {
+
+    /**
+     * Point d’entrée principal du programme.
+     *
+     * @param args les arguments de la ligne de commande (ex. {@code --dir=c:/TEMP/data})
+     */
     public static void main(String[] args) {
-        View.greets();
-        Repository.greetsFromInfra();
+
+        // 1. Analyse des arguments de la ligne de commande
+        // On cherche l’argument commençant par "--dir=" afin d’obtenir le chemin du dossier de travail.
+        String dirPath = null;
+        for (String arg : args) {
+            if (arg.startsWith("--dir=")) {
+                dirPath = arg.substring(6); // On extrait la partie après "--dir="
+                break;
+            }
+        }
+
+        // 2. Validation du dossier fourni
+        // Si aucun argument ou un dossier invalide est passé, on affiche un message d’erreur et on arrête le programme.
+        if (dirPath == null || !new File(dirPath).isDirectory()) {
+            System.out.println("argument requis dir manquant ou incorrect");
+            return;
+        }
+
+        // 3. Initialisation du pattern MVP
+        // Création du répertoire de travail à partir du chemin fourni.
+        File directory = new File(dirPath);
+
+        // Le repository gère la lecture du fichier JSON contenant les films.
+        JsonMovieRepository repository = new JsonMovieRepository(directory);
+
+        // La vue s’occupe de l’affichage en ligne de commande.
+        MovieListCLIView view = new MovieListCLIView();
+
+        // Le présentateur fait le lien entre la vue et le repository (logique de coordination).
+        MoviePresenter presenter = new MoviePresenter(repository, view);
+
+        // 4. Configuration du menu CLI
+        // On prépare les flux d’entrée et de sortie pour interagir avec l’utilisateur.
+        BufferedReader cin = new BufferedReader(new InputStreamReader(System.in));
+        PrintStream cout = System.out;
+
+        // On instancie la carte de commandes et on y ajoute les options du menu principal.
+        CommandMap menu = new CommandMap(cin, cout);
+        menu.addItem("Lister les films à planifier", new ListMoviesCommand(presenter));
+
+        // 5. Lancement du menu principal
+        // Le menu exécute la commande choisie par l’utilisateur.
+        menu.execute();
     }
 }

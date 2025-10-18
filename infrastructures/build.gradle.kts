@@ -4,5 +4,6 @@ plugins {
 }
 
 dependencies {
-     implementation(project(":domains"))
+    implementation(project(":domains"))
+    implementation("com.google.code.gson:gson:2.7")
 }
