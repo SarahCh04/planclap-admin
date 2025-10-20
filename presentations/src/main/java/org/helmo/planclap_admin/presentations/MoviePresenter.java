@@ -2,6 +2,11 @@ package org.helmo.planclap_admin.presentations;
 
 import org.helmo.planclap_admin.domains.Movie;
 import org.helmo.planclap_admin.domains.MovieRepository;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 /**
@@ -33,16 +38,25 @@ public class MoviePresenter {
      * Chaque {@link MovieViewModel} contient le titre, la durée formatée en HH:MM et le nombre de séances
      * prévues pour le film.
      */
-    public void displayMovies() {
-        // Charge tous les films depuis le repository
-        List<Movie> movies = repository.loadMovies();
 
-        // Transforme chaque film en MovieViewModel pour la vue
+    public void displayMovies() {
+        List<Movie> movies = repository.loadMovies();
         List<MovieViewModel> models = movies.stream()
                 .map(f -> new MovieViewModel(f.getTitle(), f.getDurationHHMM(), f.getSeances()))
                 .toList();
 
-        // Envoie les modèles à la vue pour affichage
-        view.showMovies(models);
+        // Calcul du total
+        int totalMinutes = movies.stream()
+                .mapToInt(m -> m.getDuration() * m.getSeances())
+                .sum();
+        int heures = totalMinutes / 60;
+        int minutes = totalMinutes % 60;
+
+        // Calcul du lundi de la semaine prochaine
+        LocalDate lundiProchain = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        String dateFormattee = lundiProchain.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        // Envoie toutes les infos à la vue
+        view.showMovies(models, dateFormattee, heures, minutes);
     }
 }
