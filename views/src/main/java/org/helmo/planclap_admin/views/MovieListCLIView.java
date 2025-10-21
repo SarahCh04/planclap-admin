@@ -32,12 +32,9 @@ public class MovieListCLIView implements MovieView {
      * </ul>
      * </p>
      * <p>
-     * Enfin, la méthode calcule et affiche la durée totale à planifier (somme des durées
+     * Enfin, la méthode affiche la durée totale à planifier (somme des durées
      * de chaque film multipliée par son nombre de séances).
      * </p>
-     *
-     * @param movies = la liste des films à afficher,
-     * si la liste est vide, un message indiquant qu’aucun film n’est à planifier est affiché.
      */
     @Override
     public void showMovies(List<MovieViewModel> movies, String date, int totalHeures, int totalMinutes) {

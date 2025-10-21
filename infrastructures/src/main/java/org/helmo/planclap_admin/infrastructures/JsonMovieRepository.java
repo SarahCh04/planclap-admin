@@ -1,9 +1,7 @@
 package org.helmo.planclap_admin.infrastructures;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.helmo.planclap_admin.domains.MovieRepository;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.helmo.planclap_admin.domains.Movie;
 
@@ -23,7 +21,6 @@ public class JsonMovieRepository implements MovieRepository {
 
     //Référence vers le fichier JSON contenant la liste des films
     private final File jsonFile;
-
     //Instance unique du parseur Gson utilisée pour la sérialisation/désérialisation JSON
     private final Gson gson = new Gson();
 
@@ -61,26 +58,26 @@ public class JsonMovieRepository implements MovieRepository {
             // Retour d’une liste vide pour signaler qu’aucun film n’est disponible
             return new ArrayList<>();
         }
-
         // Cas 2 : le fichier existe déjà, on le lit
         try (Reader reader = new FileReader(jsonFile)) {
-            // On lit le contenu JSON racine du fichier
-            JsonObject root = gson.fromJson(reader, JsonObject.class);
-
-            // On récupère le tableau associé à la clé "movies"
-            JsonArray moviesArray = root.getAsJsonArray("movies");
-
-            // Si le tableau est absent ou vide → on renvoie une liste vide
-            if (moviesArray == null) return new ArrayList<>();
-
-            // Définition du type générique pour la désérialisation en List<Movie>
-            Type listType = new TypeToken<List<Movie>>() {}.getType();
-
-            // Conversion du tableau JSON en liste d’objets Movie
-            return gson.fromJson(moviesArray, listType);
+            return ReadJson(reader);
         } catch (IOException e) {
             // En cas de problème de lecture, on encapsule l’erreur dans une RuntimeException
             throw new RuntimeException(e);
         }
     }
+
+    private List<Movie> ReadJson(Reader reader) {
+        // On lit le contenu JSON racine du fichier
+        JsonObject root = gson.fromJson(reader, JsonObject.class);
+        // On récupère le tableau associé à la clé "movies"
+        JsonArray moviesArray = root.getAsJsonArray("movies");
+        // Si le tableau est absent ou vide → on renvoie une liste vide
+        if (moviesArray == null) return new ArrayList<>();
+        // Définition du type générique pour la désérialisation en List<Movie>
+        Type listType = new TypeToken<List<Movie>>() {}.getType();
+        // Conversion du tableau JSON en liste d’objets Movie
+        return gson.fromJson(moviesArray, listType);
+    }
+
 }

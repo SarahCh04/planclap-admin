@@ -14,7 +14,6 @@ public class QuitCommand implements CliCommand {
      */
     @Override
     public void execute() {
-        System.out.println("Fermeture de l'application...");
-        System.exit(0);
+        throw new ApplicationQuitException();
     }
 }

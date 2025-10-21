@@ -3,9 +3,8 @@
  */
 package org.helmo.planclap_admin.app;
 
-import org.helmo.planclap_admin.presentations.MoviePresenter;
-import org.helmo.planclap_admin.presentations.commands.CommandMap;
-import org.helmo.planclap_admin.presentations.commands.ListMoviesCommand;
+import org.helmo.planclap_admin.presentations.*;
+import org.helmo.planclap_admin.presentations.commands.*;
 import org.helmo.planclap_admin.views.MovieListCLIView;
 import org.helmo.planclap_admin.infrastructures.JsonMovieRepository;
 
@@ -75,6 +74,10 @@ public class Program {
 
         // 5. Lancement du menu principal
         // Le menu exécute la commande choisie par l’utilisateur.
-        menu.execute();
+        try {
+            menu.execute();
+        } catch (ApplicationQuitException e) {
+        }
+        System.out.println("Fermeture de l'application");
     }
 }
