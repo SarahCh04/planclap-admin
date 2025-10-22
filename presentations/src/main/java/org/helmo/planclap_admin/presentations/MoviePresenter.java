@@ -40,23 +40,27 @@ public class MoviePresenter {
      */
 
     public void displayMovies() {
-        List<Movie> movies = repository.loadMovies();
-        List<MovieViewModel> models = movies.stream()
-                .map(f -> new MovieViewModel(f.getTitle(), f.getDurationHHMM(), f.getSeances()))
-                .toList();
+        try{
+            List<Movie> movies = repository.loadMovies();
+            List<MovieViewModel> models = movies.stream()
+                    .map(f -> new MovieViewModel(f.getTitle(), f.getDurationHHMM(), f.getSeances()))
+                    .toList();
+            // Calcul du total d'heures
+            int totalMinutes = movies.stream()
+                    .mapToInt(m -> m.getDuration() * m.getSeances())
+                    .sum();
+            int heures = totalMinutes / 60;
+            int minutes = totalMinutes % 60;
 
-        // Calcul du total
-        int totalMinutes = movies.stream()
-                .mapToInt(m -> m.getDuration() * m.getSeances())
-                .sum();
-        int heures = totalMinutes / 60;
-        int minutes = totalMinutes % 60;
+            // Calcul du lundi de la semaine prochaine
+            LocalDate lundiProchain = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+            String dateFormattee = lundiProchain.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        // Calcul du lundi de la semaine prochaine
-        LocalDate lundiProchain = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-        String dateFormattee = lundiProchain.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            // Envoie toutes les infos à la vue
+            view.showMovies(models, dateFormattee, heures, minutes);
+        }catch (Exception e){
+            view.displayError("Impossible de charger les films !");
+        }
 
-        // Envoie toutes les infos à la vue
-        view.showMovies(models, dateFormattee, heures, minutes);
     }
 }

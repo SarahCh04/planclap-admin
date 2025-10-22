@@ -4,5 +4,6 @@ import java.util.List;
 
 public interface MovieView {
     void showMovies(List<MovieViewModel> movies, String date, int heures, int minutes);
+    void displayError(String message);
 }
 

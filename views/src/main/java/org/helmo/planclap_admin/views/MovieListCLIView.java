@@ -56,4 +56,10 @@ public class MovieListCLIView implements MovieView {
         System.out.printf("Durée totale : %d h %02d%n", totalHeures, totalMinutes);
     }
 
+    @Override
+    public void displayError(String message) {
+        System.out.println("Erreur : " + message);
+    }
+
+
 }

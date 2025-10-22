@@ -5,7 +5,7 @@ package org.helmo.planclap_admin.app;
 
 import org.helmo.planclap_admin.presentations.*;
 import org.helmo.planclap_admin.presentations.commands.*;
-import org.helmo.planclap_admin.views.MovieListCLIView;
+import org.helmo.planclap_admin.views.*;
 import org.helmo.planclap_admin.infrastructures.JsonMovieRepository;
 
 import java.io.*;
@@ -53,31 +53,34 @@ public class Program {
         // 3. Initialisation du pattern MVP
         // Création du répertoire de travail à partir du chemin fourni.
         File directory = new File(dirPath);
-
         // Le repository gère la lecture du fichier JSON contenant les films.
         JsonMovieRepository repository = new JsonMovieRepository(directory);
 
-        // La vue s’occupe de l’affichage en ligne de commande.
-        MovieListCLIView view = new MovieListCLIView();
-
-        // Le présentateur fait le lien entre la vue et le repository (logique de coordination).
-        MoviePresenter presenter = new MoviePresenter(repository, view);
-
-        // 4. Configuration du menu CLI
-        // On prépare les flux d’entrée et de sortie pour interagir avec l’utilisateur.
+        // 4. Configuration des flux d'entrée/sortie
         BufferedReader cin = new BufferedReader(new InputStreamReader(System.in));
         PrintStream cout = System.out;
 
-        // On instancie la carte de commandes et on y ajoute les options du menu principal.
-        CommandMap menu = new CommandMap(cin, cout);
-        menu.addItem("Lister les films à planifier", new ListMoviesCommand(presenter));
+        // 5. Initialisation des vues
+        MovieListCLIView movieListView = new MovieListCLIView();
+        AddMovieCLIView addMovieView = new AddMovieCLIView(cin, cout);
 
-        // 5. Lancement du menu principal
-        // Le menu exécute la commande choisie par l’utilisateur.
+        // 6. Initialisation des présentateurs
+        MoviePresenter moviePresenter = new MoviePresenter(repository, movieListView);
+        AddMoviePresenter addMoviePresenter = new AddMoviePresenter(repository, addMovieView);
+
+        // 7. Configuration du menu CLI
+        CommandMap menu = new CommandMap(cin, cout);
+        menu.addItem("Lister les films à planifier", new ListMoviesCommand(moviePresenter));
+        menu.addItem("Encoder un film", new AddMovieCommand(addMoviePresenter));
+        // TODO: Ajouter les autres commandes pour les US suivantes
+
+        // 8. Lancement du menu principal
         try {
             menu.execute();
         } catch (ApplicationQuitException e) {
+            // L'utilisateur a choisi de quitter
         }
+
         System.out.println("Fermeture de l'application");
     }
 }
