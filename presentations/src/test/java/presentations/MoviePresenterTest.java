@@ -1,161 +1,124 @@
 package presentations;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.ArgumentCaptor;
 import org.helmo.planclap_admin.presentations.*;
 import org.helmo.planclap_admin.domains.*;
+
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-class MoviePresenterTest { //TODO : simplifier avec mockito
+class MoviePresenterTest {
+
+    @Mock
+    private MovieRepository mockRepository;
+
+    @Mock
+    private MovieView mockView;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     void testDisplayMoviesWithValidData() {
         // Arrange
-        List<Movie> movies = new ArrayList<>();
-        movies.add(createTestMovie("Vaiana", 100, 1));
-        movies.add(createTestMovie("Dune : Deuxième Partie", 166, 1));
+        List<Movie> movies = List.of(
+                createTestMovie("Vaiana", 100, 1),
+                createTestMovie("Dune : Deuxième Partie", 166, 1)
+        );
 
-        FakeMovieRepository repo = new FakeMovieRepository(movies);
-        FakeMovieView view = new FakeMovieView();
-        MoviePresenter presenter = new MoviePresenter(repo, view);
+        when(mockRepository.loadMovies()).thenReturn(movies);
+
+        MoviePresenter presenter = new MoviePresenter(mockRepository, mockView);
 
         // Act
         presenter.displayMovies();
 
         // Assert
-        assertFalse(view.displayedMovies.isEmpty());
-        assertEquals(2, view.displayedMovies.size());
-        assertNotNull(view.displayedDate);
-        assertTrue(view.totalHeures >= 0);
-        assertTrue(view.totalMinutes >= 0);
+        // Capture les arguments passés à showMovies()
+        ArgumentCaptor<List<MovieViewModel>> moviesCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<String> dateCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Integer> heuresCaptor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<Integer> minutesCaptor = ArgumentCaptor.forClass(Integer.class);
+
+        verify(mockView).showMovies(
+                moviesCaptor.capture(),
+                dateCaptor.capture(),
+                heuresCaptor.capture(),
+                minutesCaptor.capture()
+        );
+
+        // Vérifications
+        List<MovieViewModel> displayedMovies = moviesCaptor.getValue();
+        assertEquals(2, displayedMovies.size());
+        assertEquals("Vaiana", displayedMovies.get(0).getTitre());
+        assertEquals("Dune : Deuxième Partie", displayedMovies.get(1).getTitre());
+
+        assertNotNull(dateCaptor.getValue());
+        assertTrue(heuresCaptor.getValue() >= 0);
+        assertTrue(minutesCaptor.getValue() >= 0);
+
+        // Vérifie que displayError n'a PAS été appelé
+        verify(mockView, never()).displayError(anyString());
     }
 
     @Test
     void testDisplayMoviesWithEmptyList() {
         // Arrange
-        FakeMovieRepository repo = new FakeMovieRepository(new ArrayList<>());
-        FakeMovieView view = new FakeMovieView();
-        MoviePresenter presenter = new MoviePresenter(repo, view);
+        when(mockRepository.loadMovies()).thenReturn(new ArrayList<>());
+
+        MoviePresenter presenter = new MoviePresenter(mockRepository, mockView);
 
         // Act
         presenter.displayMovies();
 
         // Assert
-        assertTrue(view.displayedMovies.isEmpty());
-        assertEquals(0, view.totalHeures);
-        assertEquals(0, view.totalMinutes);
+        ArgumentCaptor<List<MovieViewModel>> moviesCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<Integer> heuresCaptor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<Integer> minutesCaptor = ArgumentCaptor.forClass(Integer.class);
+
+        verify(mockView).showMovies(
+                moviesCaptor.capture(),
+                anyString(),
+                heuresCaptor.capture(),
+                minutesCaptor.capture()
+        );
+
+        assertTrue(moviesCaptor.getValue().isEmpty());
+        assertEquals(0, heuresCaptor.getValue());
+        assertEquals(0, minutesCaptor.getValue());
     }
 
     @Test
     void testDisplayMoviesWithRepositoryError() {
         // Arrange
-        FakeMovieRepository repo = new FakeMovieRepository(true); // Simule une erreur
-        FakeMovieView view = new FakeMovieView();
-        MoviePresenter presenter = new MoviePresenter(repo, view);
+        when(mockRepository.loadMovies()).thenThrow(new RuntimeException("Erreur simulée"));
+
+        MoviePresenter presenter = new MoviePresenter(mockRepository, mockView);
 
         // Act
         presenter.displayMovies();
 
         // Assert
-        assertNotNull(view.errorMessage);
-        assertTrue(view.errorMessage.contains("Impossible de charger les films"));
-    }
+        ArgumentCaptor<String> errorCaptor = ArgumentCaptor.forClass(String.class);
+        verify(mockView).displayError(errorCaptor.capture());
 
-    // --- Classes de test (Fakes) ---
+        String errorMessage = errorCaptor.getValue();
+        assertTrue(errorMessage.contains("Impossible de charger les films"));
 
-    /**
-     * Fake Repository pour les tests.
-     * Implémente toutes les méthodes de MovieRepository.
-     */
-    static class FakeMovieRepository implements MovieRepository {
-        private final List<Movie> movies;
-        private final boolean throwError;
-
-        public FakeMovieRepository(List<Movie> movies) {
-            this.movies = movies;
-            this.throwError = false;
-        }
-
-        public FakeMovieRepository(boolean throwError) {
-            this.movies = new ArrayList<>();
-            this.throwError = throwError;
-        }
-
-        @Override
-        public List<Movie> loadMovies() {
-            if (throwError) {
-                throw new RuntimeException("Erreur simulée");
-            }
-            return new ArrayList<>(movies);
-        }
-
-        @Override
-        public void saveMovies(List<Movie> movies) {
-            this.movies.clear();
-            this.movies.addAll(movies);
-        }
-
-        @Override
-        public Optional<Movie> findByTitleOrSlug(String searchTerm) {
-            return movies.stream()
-                    .filter(m -> m.getTitle().equalsIgnoreCase(searchTerm) ||
-                            m.getSlug().equalsIgnoreCase(searchTerm))
-                    .findFirst();
-        }
-
-        @Override
-        public boolean existsByTitle(String title) {
-            return movies.stream().anyMatch(m -> m.getTitle().equalsIgnoreCase(title));
-        }
-
-        @Override
-        public boolean existsBySlug(String slug) {
-            return movies.stream().anyMatch(m -> m.getSlug().equalsIgnoreCase(slug));
-        }
-
-        @Override
-        public void addMovie(Movie movie) {
-            movies.add(movie);
-        }
-
-        @Override
-        public int getTotalMinutesToSchedule() {
-            return movies.stream()
-                    .mapToInt(m -> m.getDuration() * m.getSeances())
-                    .sum();
-        }
-    }
-
-    /**
-     * Fake View pour capturer les appels.
-     */
-    static class FakeMovieView implements MovieView {
-        List<MovieViewModel> displayedMovies = new ArrayList<>();
-        String displayedDate;
-        int totalHeures;
-        int totalMinutes;
-        String errorMessage;
-
-        @Override
-        public void showMovies(List<MovieViewModel> movies, String date, int heures, int minutes) {
-            this.displayedMovies = movies;
-            this.displayedDate = date;
-            this.totalHeures = heures;
-            this.totalMinutes = minutes;
-        }
-
-        @Override
-        public void displayError(String message) {
-            this.errorMessage = message;
-        }
+        // Vérifie que showMovies n'a PAS été appelé
+        verify(mockView, never()).showMovies(anyList(), anyString(), anyInt(), anyInt());
     }
 
     // --- Méthode utilitaire pour créer des films de test ---
 
-    /**
-     * Crée un film de test avec des valeurs par défaut pour les champs non essentiels.
-     */
     private static Movie createTestMovie(String title, int duration, int seances) {
         return new Movie(
                 title,

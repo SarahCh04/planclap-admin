@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "planclap-admin"
-include("app", "views", "presentations", "domains", "infras tructures")
+include("app", "views", "presentations", "domains", "infrastructures")
