@@ -65,6 +65,12 @@ public class AddMovieCLIView implements AddMovieView {
         if (age == null) return null;
         cinechecks.add(age.trim());
 
+        // Si c’est "AL", on ne demande pas les libellés de contenu
+        if (age.equalsIgnoreCase("AL")) {
+            cout.println("Aucun libellé de contenu requis pour 'AL'.");
+            return cinechecks;
+        }
+
         // Libellés de contenu optionnels
         cout.println("Libellés de contenu (appuyez sur Entrée pour terminer) :");
         while (true) {
