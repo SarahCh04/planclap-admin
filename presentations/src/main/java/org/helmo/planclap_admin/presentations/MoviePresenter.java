@@ -43,7 +43,7 @@ public class MoviePresenter {
         try{
             List<Movie> movies = repository.loadMovies();
             List<MovieViewModel> models = movies.stream()
-                    .map(f -> new MovieViewModel(f.getTitle(), f.getDurationHHMM(), f.getSeances()))
+                    .map(f -> new MovieViewModel(f.getSlug(),f.getTitle(), f.getDurationHHMM(),f.getPosterUrl(),f.getDescription(),f.getCinechecks().toString(), f.getSeances()))
                     .toList();
             // Calcul du total d'heures
             int totalMinutes = movies.stream()

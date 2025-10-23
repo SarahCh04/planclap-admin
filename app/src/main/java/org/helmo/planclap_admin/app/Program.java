@@ -63,15 +63,18 @@ public class Program {
         // 5. Initialisation des vues
         MovieListCLIView movieListView = new MovieListCLIView();
         AddMovieCLIView addMovieView = new AddMovieCLIView(cin, cout);
+        ConsultMovieCLIView consultMovieCLIView = new ConsultMovieCLIView(cin, cout);
 
         // 6. Initialisation des présentateurs
         MoviePresenter moviePresenter = new MoviePresenter(repository, movieListView);
         AddMoviePresenter addMoviePresenter = new AddMoviePresenter(repository, addMovieView);
+        ConsultMoviePresenter consultMoviePresenter = new ConsultMoviePresenter(repository, consultMovieCLIView);
 
         // 7. Configuration du menu CLI
         CommandMap menu = new CommandMap(cin, cout);
         menu.addItem("Lister les films à planifier", new ListMoviesCommand(moviePresenter));
         menu.addItem("Encoder un film", new AddMovieCommand(addMoviePresenter));
+        menu.addItem("Consulter un film", new ConsultMovieCommand(consultMoviePresenter));
         // TODO: Ajouter les autres commandes pour les US suivantes
 
         // 8. Lancement du menu principal

@@ -63,4 +63,7 @@ public interface MovieRepository {
      * @return le total en minutes (durée × nombre de séances pour chaque film)
      */
     int getTotalMinutesToSchedule();
+
+
+
 }

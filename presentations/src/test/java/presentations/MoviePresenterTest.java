@@ -58,8 +58,8 @@ class MoviePresenterTest {
         // Vérifications
         List<MovieViewModel> displayedMovies = moviesCaptor.getValue();
         assertEquals(2, displayedMovies.size());
-        assertEquals("Vaiana", displayedMovies.get(0).getTitre());
-        assertEquals("Dune : Deuxième Partie", displayedMovies.get(1).getTitre());
+        assertEquals("Vaiana", displayedMovies.get(0).getTitle());
+        assertEquals("Dune : Deuxième Partie", displayedMovies.get(1).getTitle());
 
         assertNotNull(dateCaptor.getValue());
         assertTrue(heuresCaptor.getValue() >= 0);

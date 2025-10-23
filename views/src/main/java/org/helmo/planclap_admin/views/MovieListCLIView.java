@@ -1,7 +1,6 @@
 package org.helmo.planclap_admin.views;
 
-import org.helmo.planclap_admin.presentations.MovieView;
-import org.helmo.planclap_admin.presentations.MovieViewModel;
+import org.helmo.planclap_admin.presentations.*;
 import java.util.List;
 
 
@@ -48,8 +47,8 @@ public class MovieListCLIView implements MovieView {
 
         for (MovieViewModel movie : movies) {
             System.out.printf("%s - %s - %d séances%n",
-                    movie.getTitre(),
-                    movie.getDureeHHMM(),
+                    movie.getTitle(),
+                    movie.getDurationHHMM(),
                     movie.getNbSeances());
         }
 
